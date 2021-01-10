@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import Backdrop from '../UIElements/Backdrop';
+import NavigationLinks from './NavigationLinks';
 
 //@material-ui
 import clsx from 'clsx';
@@ -9,19 +11,13 @@ import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-// import ListItem from '@material-ui/core/ListItem';
-// import ListItemIcon from '@material-ui/core/ListItemIcon';
-// import ListItemText from '@material-ui/core/ListItemText';
-// import InboxIcon from '@material-ui/icons/MoveToInbox';
-// import MailIcon from '@material-ui/icons/Mail';
-
+import Button from '@material-ui/core/Button';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 
 const drawerWidth = 240;
@@ -54,6 +50,7 @@ const useStyles = makeStyles(theme => ({
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
+    zIndex: theme.zIndex.drawer + 2,
   },
   drawerPaper: {
     width: drawerWidth,
@@ -84,6 +81,18 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     flexGrow: 1,
+    listStyle: 'none',
+    textDecoration: 'none',
+    color: '#fff',
+  },
+  authBtn: {
+    color: '#fff',
+    outline: 'none',
+  },
+  wrapIcon: {
+    verticalAlign: 'middle',
+    display: 'inline-flex',
+    marginRight: '5px',
   },
 }));
 
@@ -122,10 +131,23 @@ export default function PersistentDrawerLeft() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap className={classes.title}>
+          <Typography
+            variant="h6"
+            noWrap
+            className={classes.title}
+            component={Link}
+            to="/"
+          >
             PlacesHub
           </Typography>
-          <AccountCircleIcon />
+          <Button
+            component={Link}
+            to="/auth"
+            size="small"
+            className={classes.authBtn}
+          >
+            <AccountCircleIcon className={classes.wrapIcon} /> Auth
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -147,6 +169,7 @@ export default function PersistentDrawerLeft() {
           </IconButton>
         </div>
         <Divider />
+        <NavigationLinks />
       </Drawer>
     </div>
   );
