@@ -22,7 +22,7 @@ const UserItem = ({ name, placeCount, image, id }) => {
   const classes = useStyles();
 
   return (
-    <Grid item xs={12} lg={6}>
+    <Grid item xs={12} sm={12} lg={6}>
       <Link to={`/${id}/places`} style={{ textDecoration: 'none' }}>
         <Card className={classes.root}>
           <CardHeader

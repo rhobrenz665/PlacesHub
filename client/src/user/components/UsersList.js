@@ -2,22 +2,23 @@ import React from 'react';
 import UserItem from './UserItem';
 
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 
 const UsersList = ({ items }) => {
   if (items.length === 0) {
     return (
-      <div className="center">
-        <h2>No users found.</h2>
-      </div>
+      <Typography variant="h3" align="center" style={{ marginTop: '5rem' }}>
+        No users found!
+      </Typography>
     );
   }
 
   return (
     <Grid container direction="column">
       <Grid item container>
-        <Grid item xs={false} sm={4} />
-        <Grid item xs={12} sm={4}>
-          <Grid container spacing={6}>
+        <Grid item xs={1} sm={4} lg={3} />
+        <Grid item xs={10} sm={4} lg={6}>
+          <Grid container spacing={2}>
             {items.map(user => (
               <UserItem
                 key={user.id}
@@ -29,7 +30,7 @@ const UsersList = ({ items }) => {
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={false} sm={4} />
+        <Grid item xs={1} sm={4} lg={3} />
       </Grid>
     </Grid>
   );
