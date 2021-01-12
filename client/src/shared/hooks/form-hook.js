@@ -6,6 +6,7 @@ const formReducer = (state, action) => {
       let formIsValid = true;
       // Check all inputs if valid
       for (const inputId in state.inputs) {
+        // check if undefined //go to next iteration
         if (!state.inputs[inputId]) {
           continue;
         }

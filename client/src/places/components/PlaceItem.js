@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 
 import Modal from '../../shared/components/UIElements/Modal';
 import Map from '../../shared/components/UIElements/Map';
+import { AuthContext } from '../../shared/context/auth-context';
 
 //@material-ui
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,11 +26,21 @@ const PlaceItem = ({
   creatorId,
   coordinates,
   onDelete,
+  id,
 }) => {
+  const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const openMapHandler = () => setShowMap(true);
   const closeMapHandler = () => setShowMap(false);
+
+  const showDeleteWarningHandler = () => setShowConfirmModal(true);
+  const cancelDeleteHandler = () => setShowConfirmModal(false);
+  const confirmDeleteHandler = () => {
+    console.log('deleted');
+    setShowConfirmModal(false);
+  };
 
   const classes = useStyles({
     media: {
@@ -49,11 +61,44 @@ const PlaceItem = ({
             Close
           </Button>
         }
-        // dialogContent={{ minHeight: '200px', width: '100%' }}
       >
         <div className="map-container">
           <Map coordinates={coordinates} zoom={16} />
         </div>
+      </Modal>
+      <Modal
+        title="Are you sure?"
+        open={showConfirmModal}
+        onClose={cancelDeleteHandler}
+        actions={
+          <>
+            <Button
+              size="small"
+              onClick={cancelDeleteHandler}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              size="small"
+              color="secondary"
+              onClick={confirmDeleteHandler}
+              variant="outlined"
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <Typography
+          variant="body2"
+          color="textPrimary"
+          component="p"
+          gutterBottom
+        >
+          Do you want to proceed and delete this place? Please note that it
+          can't be undone thereafter
+        </Typography>
       </Modal>
       <Grid item lg={12}>
         <Card className={classes.card} raised={true}>
@@ -83,15 +128,35 @@ const PlaceItem = ({
             </CardContent>
           </CardActionArea>
           <CardActions>
-            <Button size="small" color="primary" onClick={openMapHandler}>
+            <Button
+              size="small"
+              color="primary"
+              onClick={openMapHandler}
+              variant="outlined"
+            >
               VIEW ON MAP
             </Button>
-            <Button size="small" color="primary">
-              Edit
-            </Button>
-            <Button size="small" color="secondary">
-              Delete
-            </Button>
+            {auth.isLoggedIn && (
+              <Button
+                component={Link}
+                size="small"
+                color="primary"
+                to={`/places/${id}`}
+                variant="outlined"
+              >
+                Edit
+              </Button>
+            )}
+            {auth.isLoggedIn && (
+              <Button
+                size="small"
+                color="secondary"
+                variant="outlined"
+                onClick={showDeleteWarningHandler}
+              >
+                Delete
+              </Button>
+            )}
           </CardActions>
         </Card>
       </Grid>

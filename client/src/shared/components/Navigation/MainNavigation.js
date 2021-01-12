@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+
+import { AuthContext } from '../../context/auth-context';
 
 import Backdrop from '../UIElements/Backdrop';
 import NavigationLinks from './NavigationLinks';
@@ -96,7 +98,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function PersistentDrawerLeft() {
+const MainNavigation = () => {
+  const auth = useContext(AuthContext);
+
   const classes = useStyles();
   const theme = useTheme();
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
@@ -140,14 +144,25 @@ export default function PersistentDrawerLeft() {
           >
             PlacesHub
           </Typography>
-          <Button
-            component={Link}
-            to="/auth"
-            size="small"
-            className={classes.authBtn}
-          >
-            <AccountCircleIcon className={classes.wrapIcon} /> Auth
-          </Button>
+          {!auth.isLoggedIn && (
+            <Button
+              component={Link}
+              to="/auth"
+              size="small"
+              className={classes.authBtn}
+            >
+              <AccountCircleIcon className={classes.wrapIcon} /> Auth
+            </Button>
+          )}
+          {auth.isLoggedIn && (
+            <Button
+              size="small"
+              className={classes.authBtn}
+              onClick={auth.logout()}
+            >
+              <AccountCircleIcon className={classes.wrapIcon} /> Logout
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -173,4 +188,6 @@ export default function PersistentDrawerLeft() {
       </Drawer>
     </div>
   );
-}
+};
+
+export default MainNavigation;

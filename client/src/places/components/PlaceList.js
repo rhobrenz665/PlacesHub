@@ -1,22 +1,38 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import PlaceItem from './PlaceItem';
+import DivContainer from '../../shared/components/UIElements/DivContainer';
 
-// import Button from '../../shared/components/FormElements/Button';
+//@material-ui
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
 
 const PlaceList = props => {
   if (props.items.length === 0) {
     return (
-      <div>
-        <Typography variant="h3" align="center" style={{ marginTop: '5rem' }}>
-          No places found. Maybe create one?
-        </Typography>
-        {/* <Button component={Link} to="/places/new">
-          Share Place
-        </Button> */}
-      </div>
+      <DivContainer>
+        <Grid container justify="center" direction="column" alignItems="center">
+          <Typography
+            variant="h4"
+            align="center"
+            style={{ marginTop: '5rem' }}
+            gutterBottom
+          >
+            No places found. Maybe create one?
+          </Typography>
+          <Button
+            component={Link}
+            to="/places/new"
+            variant="contained"
+            color="primary"
+            style={{ marginTop: '1rem' }}
+          >
+            Share Place
+          </Button>
+        </Grid>
+      </DivContainer>
     );
   }
 

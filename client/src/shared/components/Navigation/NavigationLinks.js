@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
+
+import { AuthContext } from '../../context/auth-context';
 import { Link } from 'react-router-dom';
 
 // @material-ui
@@ -22,6 +24,8 @@ const useStyles = makeStyles(theme => ({
 const NavigationLinks = () => {
   const classes = useStyles();
 
+  const auth = useContext(AuthContext);
+
   return (
     <div className={classes.root}>
       <List>
@@ -31,18 +35,22 @@ const NavigationLinks = () => {
           </ListItemIcon>
           <ListItemText primary="All Users" />
         </ListItem>
-        <ListItem button component={Link} to="/places">
-          <ListItemIcon>
-            <PlaceIcon />
-          </ListItemIcon>
-          <ListItemText primary="My Places" />
-        </ListItem>
-        <ListItem button component={Link} to="/places/new">
-          <ListItemIcon>
-            <AddCircleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Add Place" />
-        </ListItem>
+        {auth.isLoggedIn && (
+          <ListItem button component={Link} to="/places">
+            <ListItemIcon>
+              <PlaceIcon />
+            </ListItemIcon>
+            <ListItemText primary="My Places" />
+          </ListItem>
+        )}
+        {auth.isLoggedIn && (
+          <ListItem button component={Link} to="/places/new">
+            <ListItemIcon>
+              <AddCircleIcon />
+            </ListItemIcon>
+            <ListItemText primary="Add Place" />
+          </ListItem>
+        )}
       </List>
     </div>
   );
