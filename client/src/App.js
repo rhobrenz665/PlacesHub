@@ -13,7 +13,7 @@ import UpdatePlace from './places/containers/UpdatePlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 
 const App = () => {
-  const token = false;
+  const token = true;
   let routes;
 
   if (token) {
