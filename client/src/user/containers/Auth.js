@@ -6,9 +6,13 @@ import {
   VALIDATOR_REQUIRE,
 } from '../../shared/util/validators';
 import Input from '../../shared/components/FormElements/Input';
-import { useForm } from '../../shared/hooks/form-hook';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 
+//@hooks
+import { useForm } from '../../shared/hooks/form-hook';
 import { AuthContext } from '../../shared/context/auth-context';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 //@material-ui
 import Button from '@material-ui/core/Button';
@@ -53,6 +57,7 @@ const useStyles = makeStyles(theme => ({
 const Auth = props => {
   const auth = useContext(AuthContext);
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
   const [formState, inputHandler, setFormData] = useForm(
     //   initialState
@@ -92,10 +97,41 @@ const Auth = props => {
     }
     setIsLoginMode(prevMode => !prevMode);
   };
-  const authSubmitHandler = e => {
-    e.preventDefault();
-    console.log(formState.inputs);
-    auth.login();
+
+  const authSubmitHandler = async event => {
+    event.preventDefault();
+
+    if (isLoginMode) {
+      try {
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/login',
+          'POST',
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            'Content-Type': 'application/json',
+          }
+        );
+        auth.login(responseData.userId, responseData.token);
+      } catch (err) {}
+    } else {
+      try {
+        const formData = new FormData();
+        formData.append('email', formState.inputs.email.value);
+        formData.append('name', formState.inputs.name.value);
+        formData.append('password', formState.inputs.password.value);
+        formData.append('image', formState.inputs.image.value);
+        const responseData = await sendRequest(
+          'http://localhost:5000/api/users/signup',
+          'POST',
+          formData
+        );
+
+        auth.login(responseData.userId, responseData.token);
+      } catch (err) {}
+    }
   };
 
   const classes = useStyles();
@@ -103,6 +139,8 @@ const Auth = props => {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner />}
       <Card className={classes.paper}>
         <Typography component="h1" variant="h5">
           {isLoginMode ? 'Login' : 'Signup'}
