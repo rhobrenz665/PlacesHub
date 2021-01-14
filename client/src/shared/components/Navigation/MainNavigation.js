@@ -158,7 +158,7 @@ const MainNavigation = () => {
             <Button
               size="small"
               className={classes.authBtn}
-              onClick={auth.logout()}
+              onClick={auth.logout}
             >
               <AccountCircleIcon className={classes.wrapIcon} /> Logout
             </Button>

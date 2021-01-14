@@ -39,14 +39,14 @@ const PlaceList = props => {
   return (
     <Grid container direction="column">
       <Grid item container>
-        <Grid item xs={1} sm={4} />
-        <Grid item xs={10} sm={4}>
+        <Grid item xs={1} md={3} lg={4} />
+        <Grid item xs={10} md={6} lg={4}>
           <Grid container spacing={4}>
             {props.items.map(place => (
               <PlaceItem
                 key={place.id}
                 id={place.id}
-                image={place.imageUrl}
+                image={place.image}
                 title={place.title}
                 description={place.description}
                 address={place.address}
@@ -57,7 +57,7 @@ const PlaceList = props => {
             ))}
           </Grid>
         </Grid>
-        <Grid item xs={1} sm={4} />
+        <Grid item xs={1} md={3} lg={4} />
       </Grid>
     </Grid>
   );

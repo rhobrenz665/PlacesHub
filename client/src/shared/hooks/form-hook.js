@@ -4,9 +4,9 @@ const formReducer = (state, action) => {
   switch (action.type) {
     case 'INPUT_CHANGE':
       let formIsValid = true;
-      // Check all inputs if valid
+      // check all inputs
       for (const inputId in state.inputs) {
-        // check if undefined //go to next iteration
+        // check if undefined
         if (!state.inputs[inputId]) {
           continue;
         }

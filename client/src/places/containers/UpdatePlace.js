@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
 
 import Input from '../../shared/components/FormElements/Input';
 import DivContainer from '../../shared/components/UIElements/DivContainer';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+
 import {
   VALIDATOR_REQUIRE,
   VALIDATOR_MINLENGTH,
 } from '../../shared/util/validators';
 
 import { useForm } from '../../shared/hooks/form-hook';
+import { useHttpClient } from '../../shared/hooks/http-hook';
+import { AuthContext } from '../../shared/context/auth-context';
 
 // @material-ui
 import { makeStyles } from '@material-ui/core/styles';
@@ -30,45 +35,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Rizal Park',
-    description: 'Leneta tastsat utas as places teasa ',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/c/cd/Rizal_Park_Front_View.jpg',
-    address: 'Liwasang Rizal, Ermita, Maynila, 1000 Kalakhang Maynila',
-    location: {
-      lat: '14.582919',
-      lng: '120.979683',
-    },
-    creator: 'u1',
-  },
-  {
-    id: 'p2',
-    title: 'Luneta Park',
-    description:
-      'Ang Liwasang Rizal o Parkeng Rizal (Ingles: Rizal Park, Kastila: Parque Rizal) ',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/c/cd/Rizal_Park_Front_View.jpg',
-    address: 'Liwasang Rizal, Ermita, Maynila, 1000 Kalakhang Maynila',
-    location: {
-      lat: 14.582919,
-      lng: 120.979683,
-    },
-    creator: 'u2',
-  },
-];
-
 const UpdatePlace = () => {
-  const classes = useStyles();
-
-  const [isLoading, setIsLoading] = useState(true);
-
+  const auth = useContext(AuthContext);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const [loadedPlace, setLoadedPlace] = useState();
   const placeId = useParams().placeId;
-  const identifiedPlace = DUMMY_PLACES.find(p => p.id === placeId);
+  const history = useHistory();
 
-  // Initial input data
   const [formState, inputHandler, setFormData] = useForm(
     {
       title: {
@@ -84,32 +57,60 @@ const UpdatePlace = () => {
   );
 
   useEffect(() => {
-    if (identifiedPlace) {
-      // set loaded input data
-      setFormData(
-        {
-          title: {
-            value: identifiedPlace.title,
-            isValid: true,
+    const fetchPlace = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/places/${placeId}`
+        );
+        setLoadedPlace(responseData.place);
+        setFormData(
+          {
+            title: {
+              value: responseData.place.title,
+              isValid: true,
+            },
+            description: {
+              value: responseData.place.description,
+              isValid: true,
+            },
           },
-          description: {
-            value: identifiedPlace.description,
-            isValid: true,
-          },
-        },
-        true
-      );
-    }
-    setIsLoading(false);
-  }, [setFormData, identifiedPlace]);
+          true
+        );
+      } catch (err) {}
+    };
+    fetchPlace();
+  }, [sendRequest, placeId, setFormData]);
 
-  const placeSubmitHandler = event => {
+  const placeUpdateSubmitHandler = async event => {
     event.preventDefault();
-    console.log(formState.inputs);
-    console.log(formState.isValid);
+    try {
+      await sendRequest(
+        `http://localhost:5000/api/places/${placeId}`,
+        'PATCH',
+        JSON.stringify({
+          title: formState.inputs.title.value,
+          description: formState.inputs.description.value,
+        }),
+        {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + auth.token,
+        }
+      );
+      history.push('/' + auth.userId + '/places');
+    } catch (err) {}
   };
 
-  if (!identifiedPlace) {
+  const classes = useStyles();
+
+  if (isLoading) {
+    return (
+      <DivContainer>
+        <LoadingSpinner />
+      </DivContainer>
+    );
+  }
+
+  if (!loadedPlace && !error) {
     return (
       <DivContainer>
         <Typography
@@ -124,56 +125,51 @@ const UpdatePlace = () => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <DivContainer>
-        <h2>Loading!</h2>
-      </DivContainer>
-    );
-  }
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <ErrorModal error={error} onClear={clearError} />
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
-          Update Place
+          Update Places
         </Typography>
-        <form className={classes.form} onSubmit={placeSubmitHandler}>
-          <Input
-            id="title"
-            type="text"
-            label="Title"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid title."
-            onInput={inputHandler}
-            initialValue={formState.inputs.title.value}
-            fullWidth
-            initialValid={formState.inputs.description.isValid}
-          />
-          <Input
-            id="description"
-            label="Description"
-            validators={[VALIDATOR_MINLENGTH(5)]}
-            errorText="Please enter a valid description (min. 5 characters)."
-            onInput={inputHandler}
-            fullWidth
-            multiline={true}
-            rows={3}
-            initialValue={formState.inputs.description.value}
-            initialValid={formState.inputs.description.isValid}
-          />
+        {!isLoading && loadedPlace && (
+          <form className={classes.form} onSubmit={placeUpdateSubmitHandler}>
+            <Input
+              id="title"
+              type="text"
+              label="Title"
+              validators={[VALIDATOR_REQUIRE()]}
+              errorText="Please enter a valid title."
+              onInput={inputHandler}
+              fullWidth
+              initialValue={loadedPlace.title}
+              initialValid={true}
+            />
+            <Input
+              id="description"
+              label="Description"
+              validators={[VALIDATOR_MINLENGTH(5)]}
+              errorText="Please enter a valid description (min. 5 characters)."
+              onInput={inputHandler}
+              fullWidth
+              multiline={true}
+              rows={3}
+              initialValue={loadedPlace.description}
+              initialValid={true}
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={!formState.isValid}
-            style={{ marginTop: '.4rem' }}
-          >
-            Update Place
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={!formState.isValid}
+              style={{ marginTop: '.4rem' }}
+            >
+              Update Place
+            </Button>
+          </form>
+        )}
       </div>
     </Container>
   );

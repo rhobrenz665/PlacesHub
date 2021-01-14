@@ -36,7 +36,7 @@ const NavigationLinks = () => {
           <ListItemText primary="All Users" />
         </ListItem>
         {auth.isLoggedIn && (
-          <ListItem button component={Link} to="/places">
+          <ListItem button component={Link} to={`/${auth.userId}/places`}>
             <ListItemIcon>
               <PlaceIcon />
             </ListItemIcon>

@@ -8,6 +8,7 @@ import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,17 +19,23 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const UserItem = ({ name, placeCount, image, id }) => {
+const UserItem = ({ name, placeCount, image, id, itemsLength }) => {
   const classes = useStyles();
 
   return (
-    <Grid item xs={12} sm={12} lg={6}>
+    <Grid item xs={12} sm={12} lg={itemsLength === 1 ? 12 : 6}>
       <Link to={`/${id}/places`} style={{ textDecoration: 'none' }}>
         <Card className={classes.root}>
           <CardHeader
-            avatar={<Avatar src={image} alt={name} />}
-            title={name}
-            subheader={placeCount}
+            avatar={
+              <Avatar src={`http://localhost:5000/${image}`} alt={name} />
+            }
+            title={
+              <div>
+                <Typography className={classes.heading}>{name}</Typography>
+              </div>
+            }
+            subheader={`${placeCount} ${placeCount === 1 ? 'Place' : 'Places'}`}
             action={
               <IconButton aria-label="settings">
                 <MoreVertIcon />

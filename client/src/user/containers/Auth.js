@@ -8,6 +8,7 @@ import {
 import Input from '../../shared/components/FormElements/Input';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 
 //@hooks
 import { useForm } from '../../shared/hooks/form-hook';
@@ -39,18 +40,24 @@ const Copyright = () => {
 
 const useStyles = makeStyles(theme => ({
   paper: {
-    marginTop: theme.spacing(15),
+    marginTop: theme.spacing(20),
+    [theme.breakpoints.down('md')]: {
+      marginTop: theme.spacing(15),
+    },
+    [theme.breakpoints.down('sm')]: {
+      marginTop: theme.spacing(5),
+    },
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '2rem 3rem',
+    padding: '1.2rem 1.5rem',
   },
   form: {
     width: '100%',
-    marginTop: theme.spacing(1),
+    marginTop: theme.spacing(2),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2),
+    margin: theme.spacing(2, 0, 2),
   },
 }));
 
@@ -79,7 +86,7 @@ const Auth = props => {
     if (!isLoginMode) {
       //drop the name field for login
       setFormData(
-        { ...formState.inputs, name: undefined },
+        { ...formState.inputs, name: undefined, image: undefined },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
     } else {
@@ -91,6 +98,10 @@ const Auth = props => {
             value: '',
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false,
+          },
         },
         false
       );
@@ -100,7 +111,6 @@ const Auth = props => {
 
   const authSubmitHandler = async event => {
     event.preventDefault();
-
     if (isLoginMode) {
       try {
         const responseData = await sendRequest(
@@ -157,6 +167,7 @@ const Auth = props => {
               fullWidth
             />
           )}
+
           <Input
             id="email"
             type="email"
@@ -170,11 +181,14 @@ const Auth = props => {
             id="password"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
+            validators={[VALIDATOR_MINLENGTH(6)]}
             errorText="Please enter a valid password, at least 5 characters."
             onInput={inputHandler}
             fullWidth
           />
+          {!isLoginMode && (
+            <ImageUpload center id="image" onInput={inputHandler} />
+          )}
           <Button
             type="submit"
             fullWidth

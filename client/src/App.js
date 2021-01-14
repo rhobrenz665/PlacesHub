@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -13,23 +13,12 @@ import UserPlaces from './places/containers/UserPlaces';
 import UpdatePlace from './places/containers/UpdatePlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import Auth from './user/containers/Auth';
-
 import { AuthContext } from './shared/context/auth-context';
+import { useAuth } from './shared/hooks/auth-hooks';
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { token, login, logout, userId } = useAuth();
 
-  const login = useCallback(() => {
-    setIsLoggedIn(true);
-  }, []);
-
-  useEffect(() => {});
-
-  const logout = useCallback(() => {
-    setIsLoggedIn(false);
-  }, []);
-
-  const token = false;
   let routes;
 
   if (token) {
@@ -55,7 +44,13 @@ const App = () => {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+      value={{
+        isLoggedIn: !!token,
+        token: token,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
     >
       <Router>
         <MainNavigation />

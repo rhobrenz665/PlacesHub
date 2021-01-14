@@ -7,7 +7,13 @@ import { DialogContent } from '@material-ui/core';
 const CustomModal = props => {
   return (
     <div>
-      <Dialog style={props.dialog} onClose={props.onClose} open={props.open}>
+      <Dialog
+        style={props.dialog}
+        onClose={props.onClose}
+        open={props.open}
+        fullWidth={true}
+        maxWidth={'sm'}
+      >
         <DialogTitle style={props.dialogTitle}>{props.title}</DialogTitle>
         <DialogContent style={props.dialogContent}>
           {props.children}

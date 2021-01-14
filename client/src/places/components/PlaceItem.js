@@ -3,6 +3,10 @@ import { Link } from 'react-router-dom';
 
 import Modal from '../../shared/components/UIElements/Modal';
 import Map from '../../shared/components/UIElements/Map';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+
+import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
 
 //@material-ui
@@ -28,21 +32,42 @@ const PlaceItem = ({
   onDelete,
   id,
 }) => {
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const openMapHandler = () => setShowMap(true);
+
   const closeMapHandler = () => setShowMap(false);
 
-  const showDeleteWarningHandler = () => setShowConfirmModal(true);
-  const cancelDeleteHandler = () => setShowConfirmModal(false);
-  const confirmDeleteHandler = () => {
-    console.log('deleted');
+  const showDeleteWarningHandler = () => {
+    setShowConfirmModal(true);
+  };
+
+  const cancelDeleteHandler = () => {
     setShowConfirmModal(false);
   };
 
+  const confirmDeleteHandler = async () => {
+    setShowConfirmModal(false);
+    try {
+      await sendRequest(
+        `http://localhost:5000/api/places/${id}`,
+        'DELETE',
+        null,
+        {
+          Authorization: 'Bearer ' + auth.token,
+        }
+      );
+      onDelete(id);
+    } catch (err) {}
+  };
+
   const classes = useStyles({
+    card: {
+      minWidth: 345,
+    },
     media: {
       height: 0,
       paddingTop: '56.25%', // 16:9,
@@ -52,6 +77,7 @@ const PlaceItem = ({
 
   return (
     <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         open={showMap}
         onClose={closeMapHandler}
@@ -100,14 +126,15 @@ const PlaceItem = ({
           can't be undone thereafter
         </Typography>
       </Modal>
-      <Grid item lg={12}>
+      <Grid item xs={12} md={12} lg={12}>
+        {isLoading && <LoadingSpinner />}
         <Card className={classes.card} raised={true}>
           <CardActionArea>
             <CardMedia
               className={classes.media}
               component="img"
               alt={image}
-              image={image}
+              src={`http://localhost:5000/${image}`}
               title={title}
             />
             <CardContent>
@@ -136,7 +163,7 @@ const PlaceItem = ({
             >
               VIEW ON MAP
             </Button>
-            {auth.isLoggedIn && (
+            {auth.userId === creatorId && (
               <Button
                 component={Link}
                 size="small"
@@ -147,7 +174,7 @@ const PlaceItem = ({
                 Edit
               </Button>
             )}
-            {auth.isLoggedIn && (
+            {auth.userId === creatorId && (
               <Button
                 size="small"
                 color="secondary"

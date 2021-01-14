@@ -1,41 +1,48 @@
-import React from 'react';
-import PlaceList from '../components/PlaceList';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-const DUMMY_PLACES = [
-  {
-    id: 'p1',
-    title: 'Rizal Park',
-    description: 'Leneta tastsat utas as places teasa ',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/c/cd/Rizal_Park_Front_View.jpg',
-    address: 'Liwasang Rizal, Ermita, Maynila, 1000 Kalakhang Maynila',
-    location: {
-      lat: '14.582919',
-      lng: '120.979683',
-    },
-    creator: 'u1',
-  },
-  {
-    id: 'p2',
-    title: 'Luneta Park',
-    description:
-      'Ang Liwasang Rizal o Parkeng Rizal (Ingles: Rizal Park, Kastila: Parque Rizal) ',
-    imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/c/cd/Rizal_Park_Front_View.jpg',
-    address: 'Liwasang Rizal, Ermita, Maynila, 1000 Kalakhang Maynila',
-    location: {
-      lat: 14.582919,
-      lng: 120.979683,
-    },
-    creator: 'u2',
-  },
-];
+import PlaceList from '../components/PlaceList';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { useHttpClient } from '../../shared/hooks/http-hook';
+import DivContainer from '../../shared/components/UIElements/DivContainer';
 
 const UserPlaces = () => {
+  const [loadedPlaces, setLoadedPlaces] = useState();
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+
+  const userId = useParams().userId;
+
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/places/user/${userId}`
+        );
+        setLoadedPlaces(responseData.places);
+      } catch (err) {}
+    };
+    fetchPlaces();
+  }, [sendRequest, userId]);
+
+  const placeDeletedHandler = deletedPlaceId => {
+    setLoadedPlaces(prevPlaces =>
+      prevPlaces.filter(place => place.id !== deletedPlaceId)
+    );
+  };
+
   return (
-    <>
-      <PlaceList items={DUMMY_PLACES} />
-    </>
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <DivContainer>
+          <LoadingSpinner />
+        </DivContainer>
+      )}
+      {!isLoading && loadedPlaces && (
+        <PlaceList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />
+      )}
+    </React.Fragment>
   );
 };
 
