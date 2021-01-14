@@ -1,0 +1,9 @@
+{
+  "env": {
+    "mongoURI": "mongodb+srv://rhobrenz:rhobrenz17@cluster0.8qqmd.mongodb.net/mern-place?retryWrites=true&w=majority",
+    "positionStackAPIKEY": "1fc86cc6de4fa29e787d184adff11f32",
+    "geoCodingAPIKEY": "AIzaSyBJRY_0XVLY05EEt4Bl5HFtuvS0fI2o8z8",
+    "secretKey": "supersecret_dont_share",
+    "jwtExpiresInHour": "1h"
+  }
+}

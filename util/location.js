@@ -1,9 +1,8 @@
 const axios = require('axios');
-const config = require('config');
 const HttpError = require('../models/http-error');
 
-const geoCodingAPIKEY = config.get('geoCodingAPIKEY');
-const positionStackAPIKEY = config.get('positionStackAPIKEY');
+const geoCodingAPIKEY = process.env.geoCodingAPIKEY;
+const positionStackAPIKEY = process.env.positionStackAPIKEY;
 
 async function getCoordsForAddress(address) {
   // Default Location

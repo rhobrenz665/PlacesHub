@@ -5,9 +5,8 @@ const jwt = require('jsonwebtoken');
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
-const config = require('config');
-const secretKey = config.get('secretKey');
-const jwtExpiresInHour = config.get('jwtExpiresInHour');
+const secretKey = process.env.secretKey;
+const jwtExpiresInHour = process.env.jwtExpiresInHour;
 
 const getUsers = async (req, res, next) => {
   let users;
