@@ -53,7 +53,7 @@ const PlaceItem = ({
     setShowConfirmModal(false);
     try {
       await sendRequest(
-        `http://localhost:5000/api/places/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/places/${id}`,
         'DELETE',
         null,
         {
@@ -134,7 +134,7 @@ const PlaceItem = ({
               className={classes.media}
               component="img"
               alt={image}
-              src={`http://localhost:5000/${image}`}
+              src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
               title={title}
             />
             <CardContent>

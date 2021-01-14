@@ -28,7 +28,10 @@ const UserItem = ({ name, placeCount, image, id, itemsLength }) => {
         <Card className={classes.root}>
           <CardHeader
             avatar={
-              <Avatar src={`http://localhost:5000/${image}`} alt={name} />
+              <Avatar
+                src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
+                alt={name}
+              />
             }
             title={
               <div>
