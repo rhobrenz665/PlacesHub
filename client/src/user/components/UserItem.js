@@ -27,12 +27,9 @@ const UserItem = ({ name, placeCount, image, id, itemsLength }) => {
       <Link to={`/${id}/places`} style={{ textDecoration: 'none' }}>
         <Card className={classes.root}>
           <CardHeader
-            avatar={
-              <Avatar
-                src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
-                alt={name}
-              />
-            }
+            //Local image
+            // src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
+            avatar={<Avatar src={image} alt={name} />}
             title={
               <div>
                 <Typography className={classes.heading}>{name}</Typography>

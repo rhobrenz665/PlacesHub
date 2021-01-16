@@ -134,7 +134,8 @@ const PlaceItem = ({
               className={classes.media}
               component="img"
               alt={image}
-              src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
+              // src={`${process.env.REACT_APP_ASSET_URL}/${image}`}
+              src={image}
               title={title}
             />
             <CardContent>

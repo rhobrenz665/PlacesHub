@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('../util/cloudUpload');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
@@ -62,10 +63,22 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  // Upload image to cloudinary
+  let imageResult;
+  try {
+    imageResult = await cloudinary.uploader.upload(req.file.path);
+  } catch (err) {
+    const error = new HttpError(
+      'Could not upload image, please try again.',
+      500
+    );
+    return next(error);
+  }
+
   const createdUser = new User({
     name,
     email,
-    image: req.file.path,
+    image: imageResult.secure_url,
     password: hashedPassword,
     places: [],
   });

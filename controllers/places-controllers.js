@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
+const cloudinary = require('../util/cloudUpload');
 const Place = require('../models/place');
 const User = require('../models/user');
 
@@ -79,12 +80,25 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
+  // Upload image to cloudinary
+  let imageResult;
+  try {
+    imageResult = await cloudinary.uploader.upload(req.file.path);
+  } catch (err) {
+    const error = new HttpError(
+      'Could not upload image, please try again.',
+      500
+    );
+    return next(error);
+  }
+
   const createdPlace = new Place({
     title,
     description,
     address,
     location: coordinates,
-    image: req.file.path,
+    image: imageResult.secure_url,
+    cloudinary_id: imageResult.public_id,
     creator: req.userData.userId,
   });
 
@@ -207,6 +221,12 @@ const deletePlace = async (req, res, next) => {
       500
     );
     return next(error);
+  }
+
+  try {
+    await cloudinary.uploader.destroy(place.cloudinary_id);
+  } catch (err) {
+    console.log(err);
   }
 
   fs.unlink(imagePath, err => {
